@@ -1,30 +1,69 @@
 
-var storage = {results:[]};
-var allowedUrl = {'/classes/room1':true,"/classes/messages":true};
+var storage = {results:[
+  {
+    username:'Oliver',
+    text:'Hi, I"m oliver',
+    objectId:'alsakdjfalskdfjha'
+  },{
+    username:'Oliver',
+    text:'Hi, I"m oliver',
+    objectId:'alskdjgfalskdfjha'
+  },{
+    username:'Oliver',
+    text:'Hi, I"m oliver',
+    objectId:'alskdjsfalskdfjha'
+  },{
+    username:'Oliver',
+    text:'Hi, I"m oliver',
+    objectId:'alskhdjfalskdfjha'
+  },
+
+  ]};
+var currObjId = 0;
+var allowedUrl = {'/classes/room1':true,
+"/classes/messages":true,
+"/?username=":true
+};
 var fs = require("fs");
+var ASSets = {
+  '/scripts/app.js':['../client/index.html','text/html'],
+  '/':['../client/index.html','text/html'],
+  '/favicon.ico':['../client/index.html','text/html'],
+  '/scripts/refactor.js':['../client/scripts/refactor.js','text/javascript'],
+  '/images/spiffygif_46x46.gif':['../client/images/spiffygif_46x46.gif','text/html'],
+  '/styles/styles.css':['../client/styles/styles.css','text/css'],
+  '/env/config.js':['../client/env/config.js','text/javascript']
+
+
+
+}
 
 module.exports.requestHandler = function(request, response) {
 
+    console.log("Serving request type " + request.method + " for url " + request.url);
 
-  if (request.url === '/scripts/app.js' || request.url === '/' ){
 
-   fs.readFile('./client/index.html', function(error, content) {
+  if (request.url.slice(0,11) ==="/?username="){
+    request.url = '/';
+  }
+
+  if (request.url in ASSets ) {
+
+   fs.readFile(ASSets[request.url][0], function(error, content) {
     if (error) {
+      console.log(error);
       response.writeHead(500);
       response.end();
     }
     else {
-      response.writeHead(200, { 'Content-Type': 'text/html' });
+      response.writeHead(200, { 'Content-Type': ASSets[request.url][1]});
       response.write(content);
       response.end();
     }
   });
-
-
  } else{
     var headers = defaultCorsHeaders;
     headers['Content-Type'] = "application/json";
-    console.log("Serving request type " + request.method + " for url " + request.url);
     var statusCode=404;
 
     if (request.url in allowedUrl && request.method === 'GET'){
@@ -39,16 +78,26 @@ module.exports.requestHandler = function(request, response) {
         var data = '';
         data+=d;
         request.on('end',function(d){
-          storage.results.push(JSON.parse(data));
+          var parsedData = JSON.parse(data);
+          parsedData.objectId = currObjId++;
+          console.log(parsedData);
+          storage.results.push(parsedData);
+          console.log(storage);
         });
       });
+    }
+
+    if (statusCode === 404) {
+      response.end('404 error!!!');
     }
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(storage));
   }
-  module.exports.defaultCorsHeaders = defaultCorsHeaders;
 
 }
+
+
+
   var defaultCorsHeaders = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
