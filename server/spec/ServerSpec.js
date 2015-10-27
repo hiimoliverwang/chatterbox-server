@@ -70,7 +70,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._responseCode).to.equal(201);
 
     // Testing for a newline isn't a valid test
-    // TODO: Replace with with a valid test
+    // TODO: Replace wxith wxith a valid test
     // expect(res._data).to.equal(JSON.stringify('\n'));
     expect(res._ended).to.equal(true);
   });
@@ -92,7 +92,6 @@ it('Should respond with messages that were previously posted', function() {
     res = new stubs.response();
 
     handler.requestHandler(req, res);
-
     expect(res._responseCode).to.equal(200);
     var messages = JSON.parse(res._data).results;
     expect(messages.length).to.be.above(0);

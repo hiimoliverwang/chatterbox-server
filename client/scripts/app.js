@@ -32,7 +32,8 @@ var app = {
       data: {username:window.location.search.substr(10)},
       contentType: 'application/json',  
       success: function (data) {
-        console.log(data);
+        data = JSON.parse(data);
+        console.log(data, typeof data);
           // console.log(this);
         this.clearMessages();
 
@@ -52,6 +53,7 @@ var app = {
     $('#chats').children().remove();
   },
   addMessage: function(message) {
+    console.dir(message);
     if ( this.currentRoom !== 'all'){
       message = _.filter(message, function(item){
         return item.roomname === this.currentRoom;
