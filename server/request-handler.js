@@ -36,27 +36,38 @@ module.exports.requestHandler = function(request, response) {
 
       // console.log(request);
       // console.log(storage)
-      var test = '';
-      request.on('data', function(datum) {
-        test += datum;
-      })
-    if(request.method ==='GET'){
-      if (!(request.url in allowedUrl)){
-        
-        response.writeHead(404, headers);
-        response.end();
-      } else {
-        response.writeHead(200,headers);
-        response.end(JSON.stringify(storage));
-      }
-    } else if (request.method ==='POST'){
-      allowedUrl[request.url] = true;
-      response.writeHead(201, headers);
-      // storage.results.push(request._postData);
-      storage.results.push(JSON.parse(test));
-      // response.end(JSON.stringify(request._postData));
-      response.end(test);
-    }
+      // var test = '';
+      // if (request.url ==='/classes/messages'){
+
+
+
+      if(request.method ==='GET'){
+        if (!(request.url in allowedUrl)){
+          
+          response.writeHead(404, headers);
+          response.end();
+        } else {
+          response.writeHead(200,headers);
+          response.end(JSON.stringify(storage));
+        }
+      } else if (request.method ==='POST'){
+
+        request.on('data', function(d){
+          var data = '';
+          data+=d;
+
+          request.on('end',function(d){
+            console.log(data);
+            response.writeHead(201, headers);
+            storage.results.push(JSON.parse(data));
+            console.log(storage);
+            response.end();
+          });
+        });
+        // console.log(storage);
+        // storage.results.push(test);
+        // response.end(test);
+        }
 
       
     // var responseText = '';
